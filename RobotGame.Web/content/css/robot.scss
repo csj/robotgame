@@ -1,0 +1,189 @@
+﻿@function power ($x, $n) {
+  $ret: 1;
+
+  @if $n >= 0 {
+    @for $i from 1 through $n {
+      $ret: $ret * $x;
+    } 
+  } @else {
+    @for $i from $n to 0 {
+      $ret: $ret / $x;
+    }
+  }
+
+  @return $ret;
+}
+
+@mixin border-radius($radius: 3px) {
+  border-radius: #{$radius};
+  -moz-border-radius: #{$radius};
+  -webkit-border-radius: #{$radius};
+}
+
+@mixin opacity($value) {
+  filter:alpha(opacity=$value*100); /* msie */
+  -moz-opacity: $value; /* firefox 1.0 */
+  -khtml-opacity: $value; /* webkit */
+  opacity: $value; /* css 3 */
+}
+
+@mixin transform($value...) {
+  -webkit-transform: $value;
+  -moz-transform: $value;
+  -o-transform: $value;
+  transform: $value;
+}
+
+@mixin transition($args...) {
+  -webkit-transition: $args;
+  -moz-transition: $args;
+  transition: $args;
+}
+
+@mixin transition-property($args...) {
+  -webkit-transition-property: $args;
+  -moz-transition-property: $args;
+  transition-property: $args;
+}
+
+@mixin keyframes($name) {
+  @-webkit-keyframes #{$name} {
+    @content; 
+  }
+  @-moz-keyframes #{$name} {
+    @content;
+  }
+  @-o-keyframes #{$name} {
+    @content;
+  }
+  @keyframes #{$name} {
+    @content;
+  } 
+}
+
+@mixin animation($name...) {
+  -webkit-animation: $name;
+  -moz-animation: $name;
+  -ms-animation: $name;
+  animation: $name;
+}
+
+// Clearfix
+@mixin clearfix {
+  &:after {
+    content: "";
+    display: block;
+    clear: both;
+  }
+}
+
+@mixin animation-fill-mode($args...) {
+  -webkit-animation-fill-mode: $args;
+  -moz-animation-fill-mode: $args;
+  animation-fill-mode: $args;
+}
+
+$width: 600px;
+$tile-count: 20;
+$tile-padding: 1px;
+$tile-radius: 3px;
+$tile-size: ($width - $tile-padding * ($tile-count + 1)) / $tile-count;
+$robot-radius: 2px;
+
+.robotgrid {
+  position: relative;
+  width: $width;
+  height: $width; // The gameboard is a square
+
+  .grid-container {
+    position: absolute;   // the grid is absolutely positioned
+    z-index: 1;           // IMPORTANT to set the z-index for layering
+    margin: 0 auto;       // center
+
+    .grid-cell {
+      width: $tile-size;              // set the cell width
+      height: $tile-size;             // set the cell height
+      margin-bottom: $tile-padding;   // the padding between lower cells
+      margin-right: $tile-padding;    // the padding between the right cell
+      float: left;
+      @include border-radius($tile-radius);
+      background: rgba(137, 117, 63, 0.35);
+      // ...
+    }
+
+    .impassible {
+      background: rgba(52, 33, 2, 0.62);
+    }
+  }
+  .tile-container {
+    position: absolute;
+    z-index: 2;
+
+    .tile {
+      width: $tile-size;        // tile width
+      height: $tile-size;       // tile height
+      position:absolute;
+
+      // Dynamically create .position-#{x}-#{y} classes to mark
+      // where each tile will be placed
+      @for $x from 1 through $tile-count {
+        @for $y from 1 through $tile-count {
+          $zeroOffsetX: $x - 1;
+          $zeroOffsetY: $y - 1;
+          $newX: ($tile-size) * ($zeroOffsetX) + ($tile-padding * $zeroOffsetX);
+          $newY: ($tile-size) * ($zeroOffsetY) + ($tile-padding * $zeroOffsetY);
+
+          &.position-#{$zeroOffsetX}-#{$zeroOffsetY} {
+            -webkit-transform: translate($newX, $newY);
+            transform: translate($newX, $newY);
+          }
+        }
+      }
+
+      .tile-inner {
+        line-height: ($width/$tile-count) - $tile-padding;
+        text-align: center;
+        font-weight: bold;
+        z-index: 10;
+        @include border-radius($robot-radius);
+
+        .overlay {
+            position:absolute;
+            top:0px;
+            left:0px;
+            height:$tile-size - $tile-padding;
+            width:$tile-size - $tile-padding;
+        }
+
+        .direction-up {
+
+        }
+
+        .direction-right {
+            -webkit-transform: rotate(90deg);
+            transform: rotate(90deg);
+        }
+
+        .direction-down {
+            -webkit-transform: rotate(180deg);
+            transform: rotate(180deg);
+        }
+
+        .direction-left {
+            -webkit-transform: rotate(270deg);
+            transform: rotate(270deg);
+        }
+      }
+
+      .robot-good {
+        background: rgb(82, 134, 239);
+        color: rgb(48, 46, 39);
+      }
+
+      .robot-bad {
+        background: rgb(134, 28, 4);
+        color: rgb(255, 255, 255);
+      }
+    }
+  }
+}

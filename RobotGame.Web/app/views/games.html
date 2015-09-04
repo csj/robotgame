@@ -1,0 +1,49 @@
+﻿<div id="pageWrapper">
+    <div id="gamesListDiv" style="float: left; width: 200px; margin: 5px;">
+        <div class="panel panel-primary">
+            <div class="panel-heading">
+                Games list
+            </div>
+            <div style="width: 100%; padding:20px">
+                <accordion close-others="true">
+                    <accordion-group ng-repeat="game in games" is-open="game.isOpen">
+                        <accordion-heading>
+                            vs {{game.enemy}}
+                            <i ng-if="game.needsMove" class="glyphicon glyphicon-info-sign" title="Needs your move!" style="float: right"></i>
+                        </accordion-heading>
+                        <div>Opponent: {{ game.enemy }}</div>
+                        <div>Current score: {{ game.myScore }} - {{ game.enemyScore }}</div>
+                    </accordion-group>
+                </accordion>
+                <button class="btn btn-info" style="width:100%;" ng-click="refresh()">Refresh list</button>
+            </div>
+        </div>
+    </div>
+    <div id="boardDiv" style="float: left; margin: 5px; margin-left: 20px;">
+        <div id="game-container">
+            <grid></grid>
+            <div style="margin-top: 5px">
+                <button class="btn btn-info" ng-click="prev()">
+                    <i class="fa fa-fw fa-step-backward "></i>
+                </button>
+                Turn: {{ activeGame.turn }}
+                <button class="btn btn-info" ng-click="next()">
+                    <i class="fa fa-fw fa-step-forward"></i>
+                </button>
+                <button class="btn btn-info" ng-click="last()">
+                    <i class="fa fa-fw fa-fast-forward"></i>
+                </button>
+                <span class="btn btn-warning" ng-if="editing && submitWarning()" style="float:right">
+                    Specify moves for all bots!
+                    <i class="glyphicon glyphicon-ban-circle"></i>
+                </span>
+                <button class="btn btn-success" ng-if="editing && !submitWarning()" ng-click="submit()" style="float:right">
+                    Submit
+                    <i class="glyphicon glyphicon-ok-circle"></i>
+                </button>
+                <span class="btn btn-info" ng-show="waiting()" style="float:right">Waiting for opponent's move ...</span>
+            </div>
+        </div>
+    </div>
+
+</div>

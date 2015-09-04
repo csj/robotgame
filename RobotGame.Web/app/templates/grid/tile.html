@@ -1,0 +1,6 @@
+﻿<div class="tile position-{{ ngModel.col }}-{{ ngModel.row }}">
+    <div class="tile-inner  robot-{{ngModel.good ? 'good' : 'bad'}}">
+        {{ ngModel.health }}
+        <div ng-model="ngModel" class="overlay" overlay ng-click="editing && ngModel.good && rotate(ngModel)"></div>
+    </div>
+</div>

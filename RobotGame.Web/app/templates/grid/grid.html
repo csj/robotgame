@@ -1,0 +1,18 @@
+﻿<div class="robotgrid">
+    <div class="grid-container">
+        <div ng-repeat="cell in grid track by $index"
+             ng-class="{
+                'grid-cell' : true,
+                'impassible' : cell == 1
+             }">
+        </div>
+    </div>
+    <div class="tile-container">
+        <div tile
+             rotate='rotate'
+             editing='editing'
+             ng-model='tile'
+             ng-repeat='tile in tiles track by $index'>
+        </div>
+    </div>
+</div>
