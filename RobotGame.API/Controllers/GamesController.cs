@@ -53,8 +53,8 @@ namespace RobotGame.API.Controllers
 				new Game
 				{
 					enemy = "Peetee",
-					myScore = 10,
-					enemyScore = 4,
+					myScore = 1,
+					enemyScore = 1,
 					needsMove = true,
 					states =
 					{
@@ -66,76 +66,38 @@ namespace RobotGame.API.Controllers
 								  new Robot{                              
                                     good =  true,
                                     health =  50,
-                                    row =  1,
-                                    col =  11,
-                                    action =  "ML"
-                                },
-                                new Robot{
-                                    good =  true,
-                                    health =  50,
-                                    row =  2,
-                                    col =  12,
-                                    action =  "ML"
-                                },
-                               new Robot {
-                                    good =  true,
-                                    health =  50,
-                                    row =  3,
-                                    col =  12,
+                                    row =  10,
+                                    col =  10,
                                     action =  "AR"
                                 },
                                 new Robot{
-                                    good =  true,
+                                    good =  false,
                                     health =  50,
-                                    row =  4,
+                                    row =  10,
                                     col =  11,
-                                    action =  "MD"
+                                    action =  "AL"
                                 },
-                               new Robot {
+							}
+						},
+						new GameState
+						{
+							robots =
+							{
+								  new Robot{                              
                                     good =  true,
-                                    health =  50,
-                                    row =  4,
-                                    col =  13,
-                                    action =  "EX"
+                                    health =  41,
+                                    row =  10,
+                                    col =  10,
                                 },
                                 new Robot{
                                     good =  false,
-                                    health =  50,
-                                    row =  3,
-                                    col =  13,
-                                    action =  "AL"
+                                    health =  42,
+                                    row =  10,
+                                    col =  11,
                                 },
-                               new Robot {
-                                    good =  false,
-                                    health =  50,
-                                    row =  3,
-                                    col =  14,
-                                    action =  "MD"
-                                },
-                                new Robot{
-                                    good =  false,
-                                    health =  50,
-                                    row =  5,
-                                    col =  13,
-                                    action =  "EX"
-                                },
-                                new Robot{
-                                    good =  false,
-                                    health =  50,
-                                    row =  5,
-                                    col =  15,
-                                    action =  "BL"
-                                },
-                                new Robot{
-                                    good =  false,
-                                    health =  50,
-                                    row =  6,
-                                    col =  14,
-                                    action =  "AL"
-                                }
-
 							}
 						}
+
 					}
 				}
 			};
