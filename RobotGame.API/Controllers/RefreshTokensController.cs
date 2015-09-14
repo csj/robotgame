@@ -7,11 +7,11 @@ namespace RobotGame.API.Controllers
     public class RefreshTokensController : ApiController
     {
 
-        private AuthRepository _repo = null;
+        private RobotGameRepository _repo = null;
 
         public RefreshTokensController()
         {
-            _repo = new AuthRepository();
+            _repo = new RobotGameRepository();
         }
 
         [Authorize(Users="Admin")]

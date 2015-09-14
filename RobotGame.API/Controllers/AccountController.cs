@@ -18,7 +18,7 @@ namespace RobotGame.API.Controllers
     [RoutePrefix("api/Account")]
     public class AccountController : ApiController
     {
-        private AuthRepository _repo = null;
+        private RobotGameRepository _repo = null;
 
         private IAuthenticationManager Authentication
         {
@@ -27,20 +27,20 @@ namespace RobotGame.API.Controllers
 
         public AccountController()
         {
-            _repo = new AuthRepository();
+			_repo = new RobotGameRepository();
         }
 
         // POST api/Account/Register
         [AllowAnonymous]
         [Route("Register")]
-        public async Task<IHttpActionResult> Register(UserModel userModel)
+        public async Task<IHttpActionResult> Register(UserViewModel userViewModel)
         {
              if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
 
-             IdentityResult result = await _repo.RegisterUser(userModel);
+             IdentityResult result = await _repo.RegisterUser(userViewModel);
 
              IHttpActionResult errorResult = GetErrorResult(result);
 
@@ -123,7 +123,7 @@ namespace RobotGame.API.Controllers
                 return BadRequest("Invalid Provider or External Access Token");
             }
 
-            IdentityUser user = await _repo.FindAsync(new UserLoginInfo(model.Provider, verifiedAccessToken.user_id));
+			HumanPlayer user = await _repo.FindAsync(new UserLoginInfo(model.Provider, verifiedAccessToken.user_id));
 
             bool hasRegistered = user != null;
 
@@ -132,7 +132,7 @@ namespace RobotGame.API.Controllers
                 return BadRequest("External user is already registered");
             }
 
-            user = new IdentityUser() { UserName = model.UserName };
+			user = new HumanPlayer() { UserName = model.UserName };
 
             IdentityResult result = await _repo.CreateAsync(user);
             if (!result.Succeeded)

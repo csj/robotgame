@@ -32,7 +32,7 @@ namespace RobotGame.API.Providers
                 return Task.FromResult<object>(null);
             }
 
-            using (AuthRepository _repo = new AuthRepository())
+            using (RobotGameRepository _repo = new RobotGameRepository())
             {
                 client = _repo.FindClient(context.ClientId);
             }
@@ -82,7 +82,7 @@ namespace RobotGame.API.Providers
 
             context.OwinContext.Response.Headers.Add("Access-Control-Allow-Origin", new[] { allowedOrigin });
 
-            using (AuthRepository _repo = new AuthRepository())
+            using (RobotGameRepository _repo = new RobotGameRepository())
             {
                 IdentityUser user = await _repo.FindUser(context.UserName, context.Password);
 

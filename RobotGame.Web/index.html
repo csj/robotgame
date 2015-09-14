@@ -8,7 +8,7 @@
     <title>Robot game</title>
     <link href="content/css/site.css" rel="stylesheet"/>
     <link href="content/css/robot.css" rel="stylesheet"/>
-    <link href="content/css/loading-bar.css" rel="stylesheet" />
+	<link href="content/css/loading-bar.css" rel="stylesheet"/>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
 
     <link data-require="font-awesome@*" data-semver="4.0.3" rel="stylesheet" href="http://netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css" />
@@ -25,24 +25,25 @@
     <script src="scripts/angular-local-storage.min.js"></script>
     <script src="scripts/loading-bar.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/angular-ui-bootstrap/0.13.3/ui-bootstrap-tpls.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/angular-hotkeys/1.5.0/hotkeys.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/angular-hotkeys/1.5.0/hotkeys.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.8.3/underscore-min.js"></script>
 
-<!-- Load app main script -->
+	<!-- Load app main script -->
     <script src="app/app.js?v=2"></script>
 
     <!-- Load services -->
     <script src="app/services/authInterceptorService.js?v=2"></script>
     <script src="app/services/authService.js?v=2"></script>
     <script src="app/services/gamesService.js?v=2"></script>
-    <script src="app/services/ordersService.js?v=2"></script>
+    <script src="app/services/robotGameProxyService.js?v=2"></script>
     <script src="app/services/tokensManagerService.js?v=2"></script>
     <!-- Load controllers -->
     <script src="app/controllers/indexController.js?v=2"></script>
     <script src="app/controllers/gamesController.js?v=2"></script>
     <script src="app/controllers/homeController.js?v=2"></script>
     <script src="app/controllers/loginController.js?v=2"></script>
+    <script src="app/controllers/newgameController.js?v=2"></script>
     <script src="app/controllers/signupController.js?v=2"></script>
-    <script src="app/controllers/ordersController.js?v=2"></script>
     <script src="app/controllers/refreshController.js?v=2"></script>
     <script src="app/controllers/tokensManagerController.js?v=2"></script>
     <script src="app/controllers/associateController.js?v=2"></script>
@@ -64,6 +65,7 @@
             <div class="collapse navbar-collapse" data-collapse="!navbarExpanded">
                 <ul class="nav navbar-nav navbar-right">
                     <li data-ng-hide="!authentication.isAuth"><a href="#/games">My Games</a></li>
+                    <li data-ng-hide="!authentication.isAuth"><a href="#/newgame">New Game</a></li>
                     <li data-ng-hide="!authentication.isAuth"><a href="#/refresh">Refresh Token</a></li>
                     <li data-ng-hide="!authentication.isAuth"><a href="" data-ng-click="logOut()">Welcome {{authentication.userName}} / Logout</a></li>
                     <li data-ng-hide="authentication.isAuth"> <a href="#/login">Login</a></li>

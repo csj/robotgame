@@ -1,5 +1,10 @@
 ﻿using System;
 using System.Data.Entity;
+using System.IO;
+using System.Net.Http;
+using System.Net.Http.Formatting;
+using System.Net.Http.Headers;
+using System.Threading.Tasks;
 using System.Web.Http;
 using Microsoft.Owin;
 using Microsoft.Owin.Security.Facebook;
@@ -30,8 +35,7 @@ namespace RobotGame.API
 			ConfigureOAuth(app);
 			app.UseCors(Microsoft.Owin.Cors.CorsOptions.AllowAll);
 			app.UseWebApi(config);
-			Database.SetInitializer(new MigrateDatabaseToLatestVersion<AuthContext, Configuration>());
-
+			Database.SetInitializer(new MigrateDatabaseToLatestVersion<RobotGameDbContext, Configuration>());
         }
 
         public void ConfigureOAuth(IAppBuilder app)

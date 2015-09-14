@@ -1,8 +1,11 @@
 ﻿<div id="pageWrapper">
-    <div id="gamesListDiv" style="float: left; width: 200px; margin: 5px;">
+    <div id="gamesListDiv" style="float: left; width: 300px; margin: 5px;">
         <div class="panel panel-primary">
-            <div class="panel-heading">
-                Games list
+            <div class="panel-heading" style="height:50px">
+	            <button class="btn btn-default btn-sm pull-right" title="Refresh list" ng-click="refresh()">
+		            <i class="glyphicon glyphicon-refresh"></i>
+	            </button>
+				<h3 class="panel-title" style="padding-top: 5px;">Games list</h3>
             </div>
             <div style="width: 100%; padding:20px">
                 <accordion close-others="true">
@@ -15,7 +18,7 @@
                         <div>Current score: {{ game.myScore }} - {{ game.enemyScore }}</div>
                     </accordion-group>
                 </accordion>
-                <button class="btn btn-info" style="width:100%;" ng-click="refresh()">Refresh list</button>
+                <a class="btn btn-info" style="width:100%;" href="#/newgame">Start new game!</a>
             </div>
         </div>
     </div>

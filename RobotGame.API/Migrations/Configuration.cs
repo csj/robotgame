@@ -5,14 +5,14 @@ using RobotGame.API.Entities;
 
 namespace RobotGame.API.Migrations
 {
-	internal sealed class Configuration : DbMigrationsConfiguration<AuthContext>
+	internal sealed class Configuration : DbMigrationsConfiguration<RobotGameDbContext>
     {
         public Configuration()
         {
             AutomaticMigrationsEnabled = true;
         }
 
-        protected override void Seed(AuthContext context)
+        protected override void Seed(RobotGameDbContext context)
         {
             if (context.Clients.Count() > 0)
             {

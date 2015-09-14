@@ -10,36 +10,40 @@ using RobotGame.API.Models;
 namespace RobotGame.API
 {
 
-    public class AuthRepository : IDisposable
+    public class RobotGameRepository : IDisposable
     {
-        private AuthContext _ctx;
+		private RobotGameDbContext _ctx;
 
-        private UserManager<IdentityUser> _userManager;
+        private UserManager<HumanPlayer> _userManager;
 
-        public AuthRepository()
+        public RobotGameRepository(RobotGameDbContext ctx = null)
         {
-            _ctx = new AuthContext();
-            _userManager = new UserManager<IdentityUser>(new UserStore<IdentityUser>(_ctx));
+            _ctx = ctx ?? new RobotGameDbContext();
+			_userManager = new UserManager<HumanPlayer>(new UserStore<HumanPlayer>(_ctx));
         }
 
-        public async Task<IdentityResult> RegisterUser(UserModel userModel)
+        public async Task<IdentityResult> RegisterUser(UserViewModel userViewModel)
         {
-            IdentityUser user = new IdentityUser
+			HumanPlayer user = new HumanPlayer
             {
-                UserName = userModel.UserName
+                UserName = userViewModel.UserName
             };
 
-            var result = await _userManager.CreateAsync(user, userModel.Password);
+            var result = await _userManager.CreateAsync(user, userViewModel.Password);
 
             return result;
         }
 
-        public async Task<IdentityUser> FindUser(string userName, string password)
+		public async Task<HumanPlayer> FindUser(string userName, string password)
         {
-            IdentityUser user = await _userManager.FindAsync(userName, password);
-
+			HumanPlayer user = await _userManager.FindAsync(userName, password);
             return user;
         }
+
+		public HumanPlayer FindUser(string userName)
+	    {
+		    return _ctx.Users.SingleOrDefault(u => u.UserName == userName);
+	    }
 
         public Client FindClient(string clientId)
         {
@@ -51,7 +55,7 @@ namespace RobotGame.API
         public async Task<bool> AddRefreshToken(RefreshToken token)
         {
 
-           var existingToken = _ctx.RefreshTokens.Where(r => r.Subject == token.Subject && r.ClientId == token.ClientId).SingleOrDefault();
+           var existingToken = _ctx.RefreshTokens.SingleOrDefault(r => r.Subject == token.Subject && r.ClientId == token.ClientId);
 
            if (existingToken != null)
            {
@@ -93,14 +97,14 @@ namespace RobotGame.API
              return  _ctx.RefreshTokens.ToList();
         }
 
-        public async Task<IdentityUser> FindAsync(UserLoginInfo loginInfo)
+		public async Task<HumanPlayer> FindAsync(UserLoginInfo loginInfo)
         {
-            IdentityUser user = await _userManager.FindAsync(loginInfo);
+			HumanPlayer user = await _userManager.FindAsync(loginInfo);
 
             return user;
         }
 
-        public async Task<IdentityResult> CreateAsync(IdentityUser user)
+		public async Task<IdentityResult> CreateAsync(HumanPlayer user)
         {
             var result = await _userManager.CreateAsync(user);
 

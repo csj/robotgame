@@ -19,7 +19,7 @@ namespace RobotGame.API.Providers
 
             var refreshTokenId = Guid.NewGuid().ToString("n");
 
-            using (AuthRepository _repo = new AuthRepository())
+            using (RobotGameRepository _repo = new RobotGameRepository())
             {
                 var refreshTokenLifeTime = context.OwinContext.Get<string>("as:clientRefreshTokenLifeTime"); 
                
@@ -53,7 +53,7 @@ namespace RobotGame.API.Providers
             context.OwinContext.Response.Headers.Add("Access-Control-Allow-Origin", new[] { allowedOrigin });
             string hashedTokenId = Helper.GetHash(context.Token);
 
-            using (AuthRepository _repo = new AuthRepository())
+            using (RobotGameRepository _repo = new RobotGameRepository())
             {
                 var refreshToken = await _repo.FindRefreshToken(hashedTokenId);
 

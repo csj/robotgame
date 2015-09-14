@@ -1,0 +1,74 @@
+﻿<div id="pageWrapper">
+	<div class="jumbotron">
+		<h2>Start a new game</h2>
+	</div>
+	<div id="humansList" style="float: left; width: 500px; margin: 5px;">
+		<div class="panel panel-primary">
+			<div class="panel-heading">
+				vs. humans
+			</div>
+			<label style="margin: 10px">Accept challenges from other players:
+				<input type="checkbox" ng-model="accepting.value"/>
+			<span ng-show="accepting.blocking">processing ...</span>
+			</label>
+			<div style="height: 432px; overflow: auto">
+				<table class="table">
+					<tr>
+						<th>Name</th>
+						<th>&nbsp;</th>
+					</tr>
+					<tr ng-repeat="human in humans">
+						<td>
+							{{ human.name }}
+						</td>
+						<td>
+							<button class="btn btn-primary btn-sm pull-right" ng-click="startHumanGame(human.name)"
+									ng-disabled="human.isSelf">
+								Start
+								<i class="glyphicon glyphicon-play"></i>
+							</button>
+						</td>
+					</tr>
+				</table>
+			</div>
+		</div>
+	</div>
+
+	<div id="robotsList" style="float: left; margin: 5px; width: 500px; margin-left: 20px;">
+		<div class="panel panel-primary">
+			<div class="panel-heading">
+				vs. robots
+			</div>
+			<div style="margin: 5px">
+				<input type="search" placeholder="Search" ng-model="filterData.name" class="form-control" />
+			</div>
+			<div style="margin: 5px">
+				Min: <input ng-model="filterData.minRating" style="width: 60px;" />
+				Max: <input ng-model="filterData.maxRating" style="width: 60px;" />
+			</div>
+			<div style="height: 400px; overflow: auto">
+				<table class="table">
+					<tr>
+						<th>Name</th>
+						<th>Rating</th>
+						<th>&nbsp;</th>
+					</tr>
+					<tr ng-repeat="robot in robots | orderBy:'-rating' | filter:ratingFilter | filter:filterData.name">
+						<td>
+							{{ robot.name }}
+						</td>
+						<td>
+							{{ robot.rating }}
+						</td>
+						<td>
+							<button class="btn btn-primary btn-sm pull-right" ng-click="startRobotGame(robot.id)">
+								Start
+								<i class="glyphicon glyphicon-play"></i>
+							</button>
+						</td>
+					</tr>
+				</table>
+			</div>
+		</div>
+	</div>
+</div>

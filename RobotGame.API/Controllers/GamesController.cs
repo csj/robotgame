@@ -1,27 +1,118 @@
 ﻿using System.Collections.Generic;
+using System.Data.Entity;
+using System.Linq;
+using System.Net.Http;
+using System.Threading.Tasks;
 using System.Web.Http;
+using Microsoft.AspNet.Identity;
+using RobotGame.API.Models;
 
 namespace RobotGame.API.Controllers
 {
-    [RoutePrefix("api/games")]
-    public class GamesController : ApiController
-    {
-        [Authorize]
-        [Route("")]
-        public IHttpActionResult Get()
-        {
-            //ClaimsPrincipal principal = Request.GetRequestContext().Principal as ClaimsPrincipal;
+	[RoutePrefix("api/games")]
+	public class GamesController : ApiController
+	{
+		private readonly RobotGameDbContext _ctx;
+		private readonly RobotGameRepository _repo;
 
-            //var Name = ClaimsPrincipal.Current.Identity.Name;
-            //var Name1 = User.Identity.Name;
+		public GamesController()
+		{
+			_ctx = new RobotGameDbContext();
+			_repo = new RobotGameRepository(_ctx);
+		}
 
-            //var userName = principal.Claims.Where(c => c.Type == "sub").Single().Value;
+		[Authorize]
+		[Route("")]
+		public IHttpActionResult Get()
+		{
+			var me = _repo.FindUser(User.Identity.GetUserName()).Id;
 
-            return Ok(Game.CreateDummyData());
-        }
-    }
+			var gameList = _ctx.Games
+					.Where(g => g.Human1.Id == me)
+					.Select(g => new {id=g.GameId, enemy = g.Player2Name, player = 1, positions = g.Positions}).ToList()
+				.Union(_ctx.Games
+					.Where(g => g.Human2.Id == me)
+					.Select(g => new {id=g.GameId, enemy = g.Player1Name, player = 2, positions = g.Positions }).ToList()
+				).OrderBy(q =>q.id).ToList();
 
-	class Robot
+			var gameDtos = from game in gameList
+				select new GameDTO
+				{
+					enemy = game.enemy,
+					needsMove = true,
+					states = game.positions.Select(p => new GameStateDTO
+					{
+						robots = p.Robots.Select(r => new RobotDTO
+						{
+							action = r.MoveString,
+							col = r.Col,
+							row = r.Row,
+							good = r.Team == game.player,
+							health = r.Health
+						}).ToList()
+					}).ToList()
+				};
+
+			return Ok(gameDtos);
+		}
+
+		[Authorize]
+		[Route("getHumanOpponents")]
+		public IHttpActionResult GetReadyHumans()
+		{
+			var me = _repo.FindUser(User.Identity.GetUserName()).Id;
+			var humans = _ctx.Users.Where(u => u.AcceptingChallenges).Select(u => u.UserName).ToList();
+
+			return Ok(humans);
+		}
+
+
+		[Authorize]
+		[Route("setReady")]
+		[HttpPost]
+		public IHttpActionResult SetReadyForChallenges(AcceptingChallengesDTO body)
+		{
+			var me = _repo.FindUser(User.Identity.GetUserName());
+			me.AcceptingChallenges = body.ready;
+			_ctx.SaveChanges();
+
+			return Ok();
+		}
+
+		[Authorize]
+		[Route("startHumanGame")]
+		[HttpPost]
+		public async Task<IHttpActionResult> StartHumanGame(StartHumanGameDTO body)
+		{
+			var enemyName = body.name;
+			var enemy = _repo.FindUser(enemyName);
+			if (enemy == null)
+			{
+				return NotFound();
+			}
+			var me = _repo.FindUser(User.Identity.GetUserName());
+
+			var game = new Game { Human1 = me, Human2 = enemy };
+			game.SetUpInitialPosition();
+			_ctx.Games.Add(game);
+			await _ctx.SaveChangesAsync();
+
+			return Ok(); // todo, return id of new game to auto-highlight it in subsequent /games screen
+		}
+
+		public class AcceptingChallengesDTO
+		{
+			public bool ready { get; set; } // GO!
+		}
+
+		public class StartHumanGameDTO
+		{
+			public string name { get; set; }
+		}
+
+	}
+
+	class RobotDTO
 	{
 		public bool good { get; set; }
 		public int health { get; set; }
@@ -30,47 +121,50 @@ namespace RobotGame.API.Controllers
 		public string action { get; set; }
 	}
 
-	class GameState
+	class GameStateDTO
 	{
-		public List<Robot> robots { get; set; }
-		public GameState() {  robots = new List<Robot>(); }
+		public List<RobotDTO> robots { get; set; }
+		public GameStateDTO() { robots = new List<RobotDTO>(); }
 	}
 
-	class Game
+	class GameDTO
 	{
 		public string enemy { get; set; }
-		public int myScore { get; set; }
-		public int enemyScore { get; set; }
 		public bool needsMove { get; set; }
-		public List<GameState> states { get; set; }
+		public List<GameStateDTO> states { get; set; }
 
-		public Game() {  states = new List<GameState>();}
+		public GameDTO() { states = new List<GameStateDTO>(); }
 
-		public static List<Game> CreateDummyData()
+		public static List<GameDTO> CreateDummyData()
 		{
-			return new List<Game>
+			return new List<GameDTO>
 			{
-				new Game
+				new GameDTO
 				{
 					enemy = "Peetee",
-					myScore = 1,
-					enemyScore = 1,
 					needsMove = true,
 					states =
 					{
-						new GameState(),
-						new GameState
+						new GameStateDTO(),
+						new GameStateDTO
 						{
 							robots =
 							{
-								  new Robot{                              
+								  new RobotDTO{                              
                                     good =  true,
                                     health =  50,
                                     row =  10,
                                     col =  10,
                                     action =  "AR"
                                 },
-                                new Robot{
+								  new RobotDTO{                              
+                                    good =  true,
+                                    health =  50,
+                                    row =  11,
+                                    col =  11,
+                                    action =  "AU"
+                                },
+                                new RobotDTO{
                                     good =  false,
                                     health =  50,
                                     row =  10,
@@ -79,19 +173,25 @@ namespace RobotGame.API.Controllers
                                 },
 							}
 						},
-						new GameState
+						new GameStateDTO
 						{
 							robots =
 							{
-								  new Robot{                              
+								  new RobotDTO{                              
                                     good =  true,
                                     health =  41,
                                     row =  10,
                                     col =  10,
                                 },
-                                new Robot{
+								  new RobotDTO{                              
+                                    good =  true,
+                                    health =  50,
+                                    row =  11,
+                                    col =  11,
+                                },
+                                new RobotDTO{
                                     good =  false,
-                                    health =  42,
+                                    health =  32,
                                     row =  10,
                                     col =  11,
                                 },
@@ -103,168 +203,4 @@ namespace RobotGame.API.Controllers
 			};
 		}
 	}
-
-	/*
-	 * return [
-                {
-                    enemy: "Peetee",
-                    myScore: 5,
-                    enemyScore: 5,
-                    needsMove: true,
-                    states: [
-                        {},
-                        {
-                            robots: [
-                                {
-                                    good: true,
-                                    health: 50,
-                                    row: 1,
-                                    col: 11,
-                                    action: 'ML'
-                                },
-                                {
-                                    good: true,
-                                    health: 50,
-                                    row: 2,
-                                    col: 12,
-                                    action: 'ML'
-                                },
-                                {
-                                    good: true,
-                                    health: 50,
-                                    row: 3,
-                                    col: 12,
-                                    action: 'AR'
-                                },
-                                {
-                                    good: true,
-                                    health: 50,
-                                    row: 4,
-                                    col: 11,
-                                    action: 'MD'
-                                },
-                                {
-                                    good: true,
-                                    health: 50,
-                                    row: 4,
-                                    col: 13,
-                                    action: 'EX'
-                                },
-                                {
-                                    good: false,
-                                    health: 50,
-                                    row: 3,
-                                    col: 13,
-                                    action: 'AL'
-                                },
-                                {
-                                    good: false,
-                                    health: 50,
-                                    row: 3,
-                                    col: 14,
-                                    action: 'MD'
-                                },
-                                {
-                                    good: false,
-                                    health: 50,
-                                    row: 5,
-                                    col: 13,
-                                    action: 'EX'
-                                },
-                                {
-                                    good: false,
-                                    health: 50,
-                                    row: 5,
-                                    col: 15,
-                                    action: 'BL'
-                                },
-                                {
-                                    good: false,
-                                    health: 50,
-                                    row: 6,
-                                    col: 14,
-                                    action: 'AL'
-                                }
-                            ]
-                        },
-                        {
-                            robots: [
-                                {
-                                    good: true,
-                                    health: 50,
-                                    row: 1,
-                                    col: 10
-                                },
-                                {
-                                    good: true,
-                                    health: 50,
-                                    row: 2,
-                                    col: 11
-                                },
-                                {
-                                    good: true,
-                                    health: 42,
-                                    row: 3,
-                                    col: 12
-                                },
-                                {
-                                    good: true,
-                                    health: 50,
-                                    row: 5,
-                                    col: 11
-                                },
-                                {
-                                    good: false,
-                                    health: 41,
-                                    row: 3,
-                                    col: 13
-                                },
-                                {
-                                    good: false,
-                                    health: 50,
-                                    row: 4,
-                                    col: 14
-                                },
-                                {
-                                    good: false,
-                                    health: 50,
-                                    row: 5,
-                                    col: 15
-                                },
-                                {
-                                    good: false,
-                                    health: 50,
-                                    row: 6,
-                                    col: 14
-                                }
-                            ]
-                        }
-                    ]
-                },
-                {
-                    name: "Game 2",
-                    needsMove: false,
-                    enemy: "WhiteHalmos",
-                    states: [
-                        { robots: [] }, {
-                            robots: [
-                                {
-                                    good: false,
-                                    health: 50,
-                                    row: 6,
-                                    col: 14
-                                },
-                                {
-                                    good: true,
-                                    health: 50,
-                                    row: 1,
-                                    col: 10,
-                                    action: 'AD'
-                                }
-                            ]
-                        }
-                    ]
-                }
-            ];
-	 */
 }
